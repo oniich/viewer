@@ -3,6 +3,7 @@ package controller
 import model.*
 import view.Viewer
 import java.io.FileInputStream
+import java.io.IOException
 
 
 class ControllerBMP(private val path: String, private val view: Viewer): Controller {
@@ -17,6 +18,13 @@ class ControllerBMP(private val path: String, private val view: Viewer): Control
 
         if (!validateFormat()) throw IllegalArgumentException("Wrong format file.")
 
+        var expectedSize: Int = 0
+        for (i in 2..5) {
+            var tmp = data[i].toInt()
+            if (tmp < 0) tmp +=256
+            expectedSize += tmp.shl((i-2)*8)
+        }
+        if (data.size != expectedSize) throw IOException("File is corrupted.")
     }
 
     override fun validateFormat(): Boolean {
